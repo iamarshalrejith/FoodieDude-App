@@ -1,8 +1,10 @@
-import { StyleSheet, View, Text, Image } from "react-native";
+import { StyleSheet, View, Text, Image,Pressable } from "react-native";
 import React from "react";
-import products from "../../assets/data/products"
+import products from "@/assets/data/products"
 import { Colors } from "../constants/theme";
 import { Product } from "../types"
+import { useRouter } from "expo-router";
+
 
 // type Product = (typeof products)[number] // Gives me the union of all possible element types in this array.
 
@@ -13,12 +15,13 @@ type ProductListItemProps = {
 }
 
 const ProductListItem = ({product}:ProductListItemProps) => {
+  const router = useRouter();
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={()=>router.push(`/menu/${product.id}`)} >
       <Image source={{uri: product.image || defaultPizzaImage }} style={styles.image} resizeMode="contain" />
       <Text style={styles.title}>{product.name}</Text>
       <Text style={styles.price}>${product.price}</Text>
-    </View>
+    </Pressable>
   );
 };
 
