@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import React from 'react';
 import {Colors} from '@/src/constants/theme';
 import { CartItem } from '../types';
-import { Link } from 'expo-router';
 import { defaultPizzaImage } from "@/src/components/ProductListItem"
 import { FontAwesome } from '@expo/vector-icons';
 import { useCart } from '../providers/CartProvider';
@@ -12,7 +11,7 @@ type CartListItemProps = {
 };
 
 const CartListItem = ({ cartItem }: CartListItemProps) => {
-  const {} = useCart()
+  const {updateQuantity} = useCart()
   return (
     <View style={styles.container}>
       <Image
@@ -29,7 +28,7 @@ const CartListItem = ({ cartItem }: CartListItemProps) => {
       </View>
       <View style={styles.quantitySelector}>
         <FontAwesome
-          // onPress={() => updateQuantity(cartItem.id, -1)}
+          onPress={() => updateQuantity(cartItem.id, -1)}
           name="minus"
           color="gray"
           style={{ padding: 5 }}
@@ -37,7 +36,7 @@ const CartListItem = ({ cartItem }: CartListItemProps) => {
 
         <Text style={styles.quantity}>{cartItem.quantity}</Text>
         <FontAwesome
-          // onPress={() => updateQuantity(cartItem.id, 1)}
+          onPress={() => updateQuantity(cartItem.id, 1)}
           name="plus"
           color="gray"
           style={{ padding: 5 }}
