@@ -6,8 +6,10 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <CartProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack>
+          <Stack.Screen name="index" /> 
+          <Stack.Screen name="(admin)" options={{ headerShown: false }} />
+          <Stack.Screen name="(user)" options={{ headerShown: false }} />
           <Stack.Screen name="cart" options={{ presentation: 'modal' }} />
         </Stack>
       </CartProvider>

@@ -3,7 +3,7 @@ import React from "react";
 import products from "@/assets/data/products"
 import { Colors } from "../constants/theme";
 import { Product } from "../types"
-import { useRouter } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 
 
 // type Product = (typeof products)[number] // Gives me the union of all possible element types in this array.
@@ -16,8 +16,9 @@ type ProductListItemProps = {
 
 const ProductListItem = ({product}:ProductListItemProps) => {
   const router = useRouter();
+  const segments = useSegments()
   return (
-    <Pressable style={styles.container} onPress={()=>router.push(`/menu/${product.id}`)} >
+    <Pressable style={styles.container} onPress={()=>router.push(`/${segments[0]}/menu/${product.id}`)} >
       <Image source={{uri: product.image || defaultPizzaImage }} style={styles.image} resizeMode="contain" />
       <Text style={styles.title}>{product.name}</Text>
       <Text style={styles.price}>${product.price}</Text>
