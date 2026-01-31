@@ -12,7 +12,7 @@ export default function MenuStack() {
         options={{
           title: "Menu",
           headerRight: () => (
-            <Pressable onPress={() => router.push("/")}>
+            <Pressable onPress={() => router.push("/(admin)/menu/create")}>
               <FontAwesome name="plus-square-o" size={22} color="black" />
             </Pressable>
           ),
