@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, TextInput, Image } from "react-native";
+import { View, Text, StyleSheet, TextInput, Image, Alert } from "react-native";
 import React, { useState } from "react";
 import Button from "../../../components/Button";
 import { defaultPizzaImage } from "@/src/components/ProductListItem";
 import * as ImagePicker from "expo-image-picker";
-import { Stack } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 
 const CreateProductScreen = () => {
   const [name, setName] = useState("");
@@ -11,44 +11,83 @@ const CreateProductScreen = () => {
   const [errors, setErrors] = useState("");
   const [image, setImage] = useState<string | null>(null);
 
+  const { id } = useLocalSearchParams();
+  const isUpdating = !!id;
+
   const resetFields = () => {
     setName("");
     setPrice("");
+    setImage(null);
   };
 
   const validateInput = () => {
     setErrors("");
+
     if (!name) {
       setErrors("Name is required");
       return false;
     }
+
     if (!price) {
       setErrors("Price is required");
       return false;
     }
-    if (isNaN(parseFloat(price))) {
-      setErrors("Price is not a number");
+
+    if (isNaN(Number(price))) {
+      setErrors("Price must be a number");
       return false;
     }
+
     return true;
   };
 
   const onCreate = () => {
-    if (!validateInput()) {
-      return;
-    }
-    // save in db
+    if (!validateInput()) return;
+
+    
+    console.log("Creating product", { name, price, image });
+
     resetFields();
   };
+
+  const onUpdate = () => {
+    if (!validateInput()) return;
+
+    console.log("Updating product", { id, name, price, image });
+  };
+
+  const onSubmit = () => {
+    if (isUpdating) {
+      onUpdate();
+    } else {
+      onCreate();
+    }
+  };
+
+  const onDelete = () => {
+    console.log("Deleting product", id);
+  };
+
+  const confirmDelete = () => {
+    Alert.alert(
+      "Confirm delete",
+      "Are you sure you want to delete this product?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: onDelete },
+      ]
+    );
+  };
+
   const pickImage = async () => {
-    // Ask for permission
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
     if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions!");
+      Alert.alert("Permission required", "Camera roll permission is needed.");
       return;
     }
 
-    // Open image picker
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -63,14 +102,19 @@ const CreateProductScreen = () => {
 
   return (
     <View style={styles.container}>
-        <Stack.Screen options={{title:"Create Product"}} />
+      <Stack.Screen
+        options={{ title: isUpdating ? "Update Product" : "Create Product" }}
+      />
+
       <Image
         source={{ uri: image || defaultPizzaImage }}
         style={styles.image}
       />
+
       <Text style={styles.textBtn} onPress={pickImage}>
         Select Image
       </Text>
+
       <Text style={styles.label}>Name</Text>
       <TextInput
         placeholder="Name"
@@ -88,8 +132,13 @@ const CreateProductScreen = () => {
         keyboardType="numeric"
       />
 
-      <Text style={{ color: "red" }}>{errors}</Text>
-      <Button onPress={onCreate} text="create" />
+      {errors ? <Text style={styles.error}>{errors}</Text> : null}
+
+      <Button onPress={onSubmit} text={isUpdating ? "Update" : "Create"} />
+
+      {isUpdating && (
+        <Button onPress={confirmDelete} text="Delete" />
+      )}
     </View>
   );
 };
@@ -123,5 +172,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "orange",
     marginVertical: 10,
+  },
+  error: {
+    color: "red",
+    marginBottom: 10,
   },
 });

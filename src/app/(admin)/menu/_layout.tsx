@@ -18,17 +18,7 @@ export default function MenuStack() {
           ),
         }}
       />
-       <Stack.Screen
-        name="[id]"
-        options={{
-          title: "Menu",
-          headerRight: () => (
-            <Pressable onPress={() => router.push("/")}>
-              <FontAwesome name="pencil" size={22} color="black" />
-            </Pressable>
-          ),
-        }}
-      />
+      
     </Stack>
   );
 }

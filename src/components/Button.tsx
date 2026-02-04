@@ -19,13 +19,14 @@ export default Button
 const styles = StyleSheet.create({
     container: {
       width: '100%',
-      backgroundColor: '#D3F527',
+      backgroundColor: '#f78b48',
       borderRadius: 10,
       justifyContent: 'center',
       alignItems: 'center',
       padding:15,
       alignSelf: 'center',
-      maxWidth: 500
+      maxWidth: 500,
+      marginVertical: 10,
     },
     btnText: {
       fontWeight: '500',
