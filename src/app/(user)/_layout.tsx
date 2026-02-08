@@ -20,7 +20,7 @@ export default function RootLayout() {
       />
 
       <Tabs.Screen
-        name="order"
+        name="orders"
         options={{
           title: "Orders",
           tabBarIcon: ({ color, size }) => (
