@@ -1,49 +1,103 @@
-import { StyleSheet, View, Text, Image,Pressable } from "react-native";
-import React from "react";
-import products from "@/assets/data/products"
-import { Colors } from "../constants/theme";
-import { Product } from "../types"
-import { useRouter, useSegments } from "expo-router";
+import { StyleSheet, View, Text, Pressable } from 'react-native';
+import { Image } from 'expo-image';
+import React from 'react';
+import { Colors, Shadow, Radius } from '../constants/theme';
+import { Product } from '../types';
+import { useRouter, useSegments } from 'expo-router';
 
-
-// type Product = (typeof products)[number] // Gives me the union of all possible element types in this array.
-
-export const defaultPizzaImage = 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/peperoni.png'
+export const defaultPizzaImage =
+  'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/peperoni.png';
 
 type ProductListItemProps = {
-    product : Product
-}
+  product: Product;
+};
 
-const ProductListItem = ({product}:ProductListItemProps) => {
+const ProductListItem = ({ product }: ProductListItemProps) => {
   const router = useRouter();
-  const segments = useSegments()
+  const segments = useSegments();
+
   return (
-    <Pressable style={styles.container} onPress={()=>router.push(`/${segments[0]}/menu/${product.id}`)} >
-      <Image source={{uri: product.image || defaultPizzaImage }} style={styles.image} resizeMode="contain" />
-      <Text style={styles.title}>{product.name}</Text>
-      <Text style={styles.price}>${product.price}</Text>
+    <Pressable
+      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+      onPress={() => router.push(`/${segments[0]}/menu/${product.id}`)}
+    >
+      <View style={styles.imageWrapper}>
+        <Image
+          source={{ uri: product.image || defaultPizzaImage }}
+          style={styles.image}
+          contentFit="contain"
+          transition={200}
+        />
+      </View>
+      <View style={styles.info}>
+        <Text style={styles.title} numberOfLines={2}>{product.name}</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.price}>${product.price.toFixed(2)}</Text>
+          <View style={styles.addBtn}>
+            <Text style={styles.addBtnText}>+</Text>
+          </View>
+        </View>
+      </View>
     </Pressable>
   );
 };
 
 export default ProductListItem;
 
-
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 20,
-    flex:1,
+    backgroundColor: '#fff',
+    borderRadius: Radius.xl,
+    flex: 1,
     maxWidth: '50%',
+    overflow: 'hidden',
+    ...Shadow.medium,
+  },
+  pressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.97 }],
+  },
+  imageWrapper: {
+    backgroundColor: '#FFF8F5',
+    padding: 8,
+    borderRadius: Radius.xl,
   },
   image: {
-    width: "100%",
+    width: '100%',
     aspectRatio: 1,
   },
-  title: { fontSize: 18, fontWeight: "600",marginVertical:10 },
+  info: {
+    padding: 12,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 8,
+    lineHeight: 19,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   price: {
-    color: Colors.light.tint,
-    fontWeight: "bold",
-  }
+    color: Colors.primary,
+    fontWeight: '800',
+    fontSize: 16,
+  },
+  addBtn: {
+    backgroundColor: Colors.primary,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addBtnText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+    lineHeight: 22,
+  },
 });
