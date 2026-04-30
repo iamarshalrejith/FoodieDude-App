@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
 import React from 'react';
-import { Colors } from '../constants/theme';
+import { Colors, Radius, Shadow } from '../constants/theme';
 import { OrderItem } from '../types';
 import { defaultPizzaImage } from './ProductListItem';
 
@@ -11,26 +12,22 @@ type OrderItemListItemProps = {
 const OrderItemListItem = ({ item }: OrderItemListItemProps) => {
   return (
     <View style={styles.container}>
-      {/* Product Image */}
       <Image
         source={{ uri: item.products.image || defaultPizzaImage }}
         style={styles.image}
+        contentFit="contain"
       />
-
-      {/* Product Info */}
-      <View style={{ flex: 1 }}>
+      <View style={styles.info}>
         <Text style={styles.title}>{item.products.name}</Text>
-
-        <View style={styles.subtitleContainer}>
-          <Text style={styles.price}>
-            ${item.products.price.toFixed(2)}
-          </Text>
-          <Text>Size: {item.size}</Text>
+        <View style={styles.meta}>
+          <View style={styles.sizeChip}>
+            <Text style={styles.sizeText}>{item.size}</Text>
+          </View>
+          <Text style={styles.price}>${item.products.price.toFixed(2)}</Text>
         </View>
       </View>
-
-      {/* Quantity */}
-      <View style={styles.quantitySelector}>
+      <View style={styles.qtyBadge}>
+        <Text style={styles.qtyLabel}>Qty</Text>
         <Text style={styles.quantity}>{item.quantity}</Text>
       </View>
     </View>
@@ -39,39 +36,40 @@ const OrderItemListItem = ({ item }: OrderItemListItemProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: Radius.lg,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+    ...Shadow.small,
   },
   image: {
-    width: 75,
-    aspectRatio: 1,
-    marginRight: 10,
+    width: 68,
+    height: 68,
+    borderRadius: Radius.md,
+    backgroundColor: '#FFF8F5',
   },
-  title: {
-    fontWeight: '500',
-    fontSize: 16,
-    marginBottom: 5,
+  info: { flex: 1, gap: 6 },
+  title: { fontWeight: '700', fontSize: 15, color: Colors.text },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  sizeChip: {
+    backgroundColor: '#F5F0EB',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: Radius.full,
   },
-  subtitleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  sizeText: { fontSize: 11, fontWeight: '700', color: Colors.primary },
+  price: { color: Colors.primary, fontWeight: '800', fontSize: 14 },
+  qtyBadge: {
+    backgroundColor: '#F5F0EB',
+    borderRadius: Radius.md,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     alignItems: 'center',
   },
-  quantitySelector: {
-    alignItems: 'center',
-    marginLeft: 10,
-  },
-  quantity: {
-    fontWeight: '500',
-    fontSize: 18,
-  },
-  price: {
-    color: Colors.light.tint,
-    fontWeight: 'bold',
-  },
+  qtyLabel: { fontSize: 10, color: Colors.textSecondary, fontWeight: '600' },
+  quantity: { fontWeight: '800', fontSize: 18, color: Colors.text },
 });
 
 export default OrderItemListItem;
