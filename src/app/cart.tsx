@@ -1,54 +1,104 @@
-import { View, Text, Platform, FlatList } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useCart } from "../providers/CartProvider";
-import CartListItem from "../components/CartListItem";
-import Button from "../components/Button";
+import { View, Text, Platform, FlatList, StyleSheet } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useCart } from '../providers/CartProvider';
+import CartListItem from '../components/CartListItem';
+import Button from '../components/Button';
+import { Colors, Radius, Shadow } from '../constants/theme';
 
 const CartScreen = () => {
-  const { items, total } = useCart();
+  const { items, total, checkout, isCheckingOut } = useCart();
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+    <SafeAreaView style={styles.wrapper} edges={['bottom']}>
       <FlatList
         data={items}
         renderItem={({ item }) => <CartListItem cartItem={item} />}
-        contentContainerStyle={{
-          padding: 10,
-          gap: 10,
-          flexGrow: items.length === 0 ? 1 : 0,
-        }}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={[
+          styles.list,
+          items.length === 0 && styles.emptyList,
+        ]}
         ListEmptyComponent={
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
-            <Text style={{ fontSize: 16, color: "#666" }}>
-              Your cart is empty 🛒
-            </Text>
+          <View style={styles.empty}>
+            <Text style={styles.emptyEmoji}>🛒</Text>
+            <Text style={styles.emptyTitle}>Your cart is empty</Text>
+            <Text style={styles.emptySub}>Add some pizzas to get started!</Text>
           </View>
         }
+        showsVerticalScrollIndicator={false}
       />
-      <Text
-        style={{
-          fontSize: 18,
-          fontWeight: "bold",
-          marginVertical: 10,
-          marginLeft: 10,
-          backgroundColor: "#b8d332",
-          borderRadius: 5,
-          padding: 8,
-          maxWidth: 100,
-          textAlign: "center",
-          width: "100%",
-        }}
-      >
-        Total: ${total}
-      </Text>
-      {items.length > 0 && <Button text="Checkout" />}
-      <StatusBar style={Platform.OS === "android" ? "light" : "auto"} />
+
+      {items.length > 0 && (
+        <View style={styles.footer}>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>
+              {items.reduce((s, i) => s + i.quantity, 0)} items
+            </Text>
+            <View style={styles.totalBox}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalAmount}>${total.toFixed(2)}</Text>
+            </View>
+          </View>
+          <Button
+            text={isCheckingOut ? 'Placing Order...' : 'Place Order 🍕'}
+            onPress={checkout}
+            loading={isCheckingOut}
+          />
+        </View>
+      )}
+
+      <StatusBar style={Platform.OS === 'android' ? 'light' : 'auto'} />
     </SafeAreaView>
   );
 };
 
 export default CartScreen;
+
+const styles = StyleSheet.create({
+  wrapper: { flex: 1, backgroundColor: Colors.background },
+  list: { padding: 14, gap: 10 },
+  emptyList: { flexGrow: 1 },
+  empty: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 80,
+  },
+  emptyEmoji: { fontSize: 64, marginBottom: 16 },
+  emptyTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  emptySub: { fontSize: 14, color: Colors.textSecondary },
+  footer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    paddingBottom: 12,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    ...Shadow.large,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    fontWeight: '600',
+  },
+  totalBox: { alignItems: 'flex-end' },
+  totalLabel: { fontSize: 12, color: Colors.textSecondary, fontWeight: '600' },
+  totalAmount: {
+    fontSize: 26,
+    fontWeight: '900',
+    color: Colors.primary,
+    letterSpacing: -0.5,
+  },
+});
