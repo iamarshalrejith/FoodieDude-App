@@ -1,84 +1,182 @@
-import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native'
-import React, { useState } from 'react'
-import Button from '../../components/Button'
-import { useRouter } from 'expo-router'
+import { View, Text, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState } from 'react';
+import Button from '../../components/Button';
+import { useRouter } from 'expo-router';
+import { Colors, Radius, Shadow } from '../../constants/theme';
 
 const SignInScreen = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const router = useRouter()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const router = useRouter();
 
-  const onSignIn = () => {
-    console.log('Email:', email)
-    console.log('Password:', password)
-  }
+  const onSignIn = async () => {
+    setError('');
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    setLoading(true);
+    try {
+      // TODO: await supabase.auth.signInWithPassword({ email, password })
+      // Then router will auto-redirect based on AuthProvider
+      await new Promise((res) => setTimeout(res, 800));
+      router.replace('/(user)/menu');
+    } catch (e: any) {
+      setError(e.message || 'Sign in failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign In</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.wrapper}
+    >
+      <View style={styles.container}>
+        {/* Logo area */}
+        <View style={styles.logoArea}>
+          <View style={styles.logoCircle}>
+            <Text style={styles.logoEmoji}>🍕</Text>
+          </View>
+          <Text style={styles.brand}>FoodieDude</Text>
+          <Text style={styles.tagline}>Order food you love</Text>
+        </View>
 
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        style={styles.input}
-      />
+        {/* Card */}
+        <View style={styles.card}>
+          <Text style={styles.title}>Welcome back</Text>
+          <Text style={styles.subtitle}>Sign in to your account</Text>
 
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
+          {error ? (
+            <View style={styles.errorBox}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
 
-      <Button text="Sign In" onPress={onSignIn} />
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            placeholder="you@example.com"
+            placeholderTextColor="#9CA3AF"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoComplete="email"
+            style={styles.input}
+          />
 
-      <Pressable>
-        <Text style={styles.createAccountText} onPress={() => router.push('/(auth)/sign-up')}>
-          Don’t have an account? <Text style={styles.link}>Create one</Text>
-        </Text>
-      </Pressable>
-    </View>
-  )
-}
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            placeholder="••••••••"
+            placeholderTextColor="#9CA3AF"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+          />
 
-export default SignInScreen
+          <Button text="Sign In" onPress={onSignIn} loading={loading} />
+
+          <Pressable onPress={() => router.push('/(auth)/sign-up')}>
+            <Text style={styles.switchText}>
+              Don't have an account?{' '}
+              <Text style={styles.link}>Create one</Text>
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    </KeyboardAvoidingView>
+  );
+};
+
+export default SignInScreen;
 
 const styles = StyleSheet.create({
+  wrapper: { flex: 1, backgroundColor: Colors.background },
   container: {
     flex: 1,
-    padding: 20,
     justifyContent: 'center',
+    padding: 20,
+  },
+  logoArea: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  logoCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+    ...Shadow.medium,
+  },
+  logoEmoji: { fontSize: 40 },
+  brand: {
+    fontSize: 30,
+    fontWeight: '900',
+    color: Colors.text,
+    letterSpacing: -0.5,
+  },
+  tagline: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginTop: 4,
+  },
+  card: {
     backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 24,
+    ...Shadow.large,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '600',
-    marginBottom: 30,
-    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: '800',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 24,
+  },
+  errorBox: {
+    backgroundColor: '#FEF2F2',
+    borderRadius: Radius.md,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  errorText: { color: '#EF4444', fontSize: 13, fontWeight: '600' },
+  label: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 6,
   },
   input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    padding: 15,
-    fontSize: 16,
-    marginBottom: 15,
-    maxWidth: 500,
-    alignSelf: 'center',
+    backgroundColor: Colors.background,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    padding: 14,
+    fontSize: 15,
+    marginBottom: 16,
+    color: Colors.text,
   },
-  createAccountText: {
-    marginTop: 15,
+  switchText: {
+    marginTop: 16,
     textAlign: 'center',
     fontSize: 14,
-    color: '#555',
+    color: Colors.textSecondary,
   },
   link: {
-    color: '#f78b48',
-    fontWeight: '600',
+    color: Colors.primary,
+    fontWeight: '700',
   },
-})
+});
